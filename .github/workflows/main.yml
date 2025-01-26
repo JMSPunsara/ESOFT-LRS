@@ -28,7 +28,7 @@ jobs:
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ \
-            ubuntu@13.212.230.91:/ # Deploy all files and folders to the server root
+            root@13.212.230.91:/ # Deploy all files and folders to the server root
 
           # Optional: Set correct permissions
           ssh -o StrictHostKeyChecking=no root@13.212.230.91 \
