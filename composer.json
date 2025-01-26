@@ -1,0 +1,21 @@
+{
+    "name": "esoft/ers",
+    "description": "Computer Lab Equipment Reservation System",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Esoft\\Ers\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "PunsaraJMS",
+            "email": "shashinpunsara233@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.29"
+    }
+}

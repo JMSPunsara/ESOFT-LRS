@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESOFT Metro Campus - Dynamic Reservation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0f0c29;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Background Effect */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Floating Squares */
+        .squares {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .square {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+            border-radius: 4px;
+        }
+
+        @keyframes animate {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+                border-radius: 4px;
+            }
+            50% {
+                opacity: 0.5;
+                border-radius: 50%;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 4px;
+            }
+        }
+
+        /* Glowing Dots */
+        .dots {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0% {
+                transform: scale(1);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(2);
+                opacity: 0.5;
+                box-shadow: 0 0 10px #fff,
+                           0 0 20px #fff,
+                           0 0 30px #fff;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 4;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 10px;
+            padding: 8px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+            50% { box-shadow: 0 0 30px rgba(255,255,255,0.5); }
+            100% { box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 50px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: containerFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes containerFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 15s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .login-container h1 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .login-container h2 {
+            color: #a0c3ff;
+            font-size: 20px;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .input-field:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .next-btn, .create-account-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+            color: white;
+        }
+
+        .create-account-btn {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            color: white;
+        }
+
+        .next-btn:hover, .create-account-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        }
+
+        .button-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.2);
+            transform: rotate(45deg);
+            animation: buttonGlow 2s linear infinite;
+        }
+
+        @keyframes buttonGlow {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .nav-admin {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+    }
+
+    .admin-btn {
+        position: relative;
+        padding: 12px 24px;
+        background: linear-gradient(
+            135deg, 
+            rgba(88, 86, 217, 0.8) 0%,
+            rgba(255, 94, 247, 0.8) 100%
+        );
+        border: none;
+        border-radius: 15px;
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+        );
+        transition: 0.5s;
+    }
+
+    .admin-btn:hover::before {
+        left: 100%;
+    }
+
+    .admin-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(88, 86, 217, 0.4);
+    }
+
+    .admin-btn::after {
+        content: '🔐';
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: 0.3s ease;
+    }
+
+    .admin-btn:hover::after {
+        right: 15px;
+        opacity: 1;
+    }
+
+    .admin-btn span {
+        position: relative;
+        z-index: 1;
+        display: inline-block;
+        transition: 0.3s ease;
+    }
+
+    .admin-btn:hover span {
+        transform: translateX(-15px);
+    }
+
+    /* Add pulsing effect */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(88, 86, 217, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(88, 86, 217, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(88, 86, 217, 0); }
+    }
+
+    .admin-btn {
+        animation: pulse 2s infinite;
+    }
+
+    /* Add floating particles behind button */
+    .particle {
+        position: absolute;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    @keyframes floatParticle {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    .admin-btn:hover + .particles .particle {
+        animation: floatParticle 1s ease-out forwards;
+    }
+
+    /* Animated Refresh Button Styles */
+.refresh-btn {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.refresh-icon {
+    width: 24px;
+    height: 24px;
+    fill: white;
+    transition: transform 0.5s ease;
+}
+
+.refresh-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.refresh-btn:hover .refresh-icon {
+    animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.refresh-btn.clicked {
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+.refresh-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    right: 70px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.refresh-btn:hover .refresh-tooltip {
+    opacity: 1;
+}
+
+/* Modern Dialog Styles */
+.custom-dialog {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    min-width: 300px;
+    border-left: 4px solid #2196F3;
+    animation: dialogSlideIn 0.3s ease;
+}
+
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+}
+
+.dialog-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 10px;
+}
+
+.dialog-message {
+    font-size: 15px;
+    color: #4b5563;
+    margin-bottom: 20px;
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.dialog-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dialog-btn-primary {
+    background: #2196F3;
+    color: white;
+    border: none;
+}
+
+.dialog-btn-secondary {
+    background: #e5e7eb;
+    color: #4b5563;
+    border: none;
+}
+
+@keyframes dialogSlideIn {
+    from {
+        transform: translate(-50%, -60%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+
+.dev-info-btn {
+    position: fixed;
+    left: 30px;
+    bottom: 30px;
+    background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+    padding: 12px 25px;
+    border-radius: 25px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255, 65, 108, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dev-info-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 65, 108, 0.5);
+}
+
+.dev-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    max-width: 500px;
+    width: 90%;
+    backdrop-filter: blur(10px);
+}
+
+.dev-modal-content {
+    text-align: center;
+}
+
+.dev-profile {
+    margin-bottom: 20px;
+}
+
+.dev-profile img {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    border: 3px solid #FF416C;
+    margin-bottom: 15px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-btn {
+    padding: 10px 20px;
+    border-radius: 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.facebook { background: #1877F2; }
+.linkedin { background: #0A66C2; }
+.github { background: #24292F; }
+.website { background: #FF416C; }
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #FF416C;
+}
+    </style>
+</head>
+<body>
+    
+    
+    <div class="background"></div>
+    <div class="squares" id="squares"></div>
+    <div class="dots" id="dots"></div>
+    
+    <div class="header">
+        <img src="src/img/esoft-logo.png" alt="ESOFT Logo" class="logo">
+        <span>ESOFT Metro Campus Piliyandala</span>
+    </div>
+    <div class="nav-admin">
+        <button class="admin-btn" onclick="window.location.href='admin_login.php'">
+            <span>Admin Access</span>
+        </button>
+        <div class="particles">
+            <!-- Particles will be added dynamically via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Animated Refresh Button -->
+<div class="refresh-btn" onclick="refreshPage()" id="refreshButton">
+    <span class="refresh-tooltip">Refresh Page</span>
+    <svg class="refresh-icon" viewBox="0 0 24 24">
+        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+    </svg>
+</div>
+
+<!-- Last Refresh Time Display -->
+<div id="lastRefresh" class="fixed bottom-4 left-4 text-sm text-gray-600">
+    Last refreshed: <span id="refreshTime"></span>
+</div>
+
+    <div class="login-container">
+        <h1>Welcome to ESOFT Metro Campus</h1>
+        <h2>Computer Reservation System</h2>
+        <input type="text" class="input-field" placeholder="Enter your Registration Number" required>
+        <button class="next-btn">
+            <div class="button-glow"></div>
+            Next →
+        </button>
+        <button class="create-account-btn">
+            <div class="button-glow"></div>
+            + Create Account
+        </button>
+    </div>
+
+    <div class="dialog-overlay" id="dialogOverlay"></div>
+<div class="custom-dialog" id="customDialog">
+    <div class="dialog-title"></div>
+    <div class="dialog-message"></div>
+    <div class="dialog-buttons">
+        <button class="dialog-btn dialog-btn-secondary" id="dialogCancel">Cancel</button>
+        <button class="dialog-btn dialog-btn-primary" id="dialogOk">OK</button>
+    </div>
+</div>
+
+
+
+<!-- Add this HTML before closing body tag -->
+<button class="dev-info-btn" onclick="showDevInfo()">
+    <span>👨‍💻</span> Developer Info
+</button>
+
+<div class="dev-modal" id="devModal">
+    <button class="close-modal" onclick="hideDevInfo()">×</button>
+    <div class="dev-modal-content">
+        <div class="dev-profile">
+            <img src="src/img/esoft-logo.png" alt="PunsaraJMS" />
+            <h2 style="color: #FF416C;">PunsaraJMS</h2>
+            <p style="color: #666;">Full Stack Developer</p>
+        </div>
+        <div style="margin: 20px 0;">
+            <p>ESOFT Computer Lab Reservation System</p>
+            <p>Developed with ❤️ in January 2025 (Version 1.0)</p>
+            <p>A dynamic system for efficient lab resource management at ESOFT Metro Campus.</p>
+        </div>
+        <div class="social-links">
+            <a href="https://web.facebook.com/PunsaraJMS/" class="social-btn facebook">Facebook</a>
+            <a href="https://www.linkedin.com/in/punsara-jms-98b3772a0/" class="social-btn linkedin">LinkedIn</a>
+            <a href="https://github.com/JMSPunsara" class="social-btn github">GitHub</a>
+            <a href="https://punsarajms.mediacrackzone.com" class="social-btn website">Website</a>
+        </div>
+    </div>
+</div>
+
+    <script>
+
+class ModernDialog {
+    constructor() {
+        this.dialog = document.getElementById('customDialog');
+        this.overlay = document.getElementById('dialogOverlay');
+        this.okBtn = document.getElementById('dialogOk');
+        this.cancelBtn = document.getElementById('dialogCancel');
+        this.setupListeners();
+    }
+
+    setupListeners() {
+        this.okBtn.addEventListener('click', () => this.close(true));
+        this.cancelBtn.addEventListener('click', () => this.close(false));
+    }
+
+    show(options = {}) {
+        return new Promise((resolve) => {
+            this.dialog.querySelector('.dialog-title').textContent = options.title || 'Message';
+            this.dialog.querySelector('.dialog-message').textContent = options.message || '';
+            
+            this.okBtn.textContent = options.okText || 'OK';
+            this.cancelBtn.textContent = options.cancelText || 'Cancel';
+            
+            // Show/hide cancel button based on type
+            this.cancelBtn.style.display = options.type === 'confirm' ? 'block' : 'none';
+            
+            this.overlay.style.display = 'block';
+            this.dialog.style.display = 'block';
+            
+            this.resolve = resolve;
+        });
+    }
+
+    close(result) {
+        this.overlay.style.display = 'none';
+        this.dialog.style.display = 'none';
+        if (this.resolve) this.resolve(result);
+    }
+}
+
+// Initialize dialog
+const modernDialog = new ModernDialog();
+
+// Enhanced input validation and messages
+async function validateRegistrationNumber(input) {
+    const regNumber = input.value.trim();
+    
+    if (regNumber === '') {
+        await modernDialog.show({
+            title: 'Registration Number Required',
+            message: 'Please enter your student registration number to continue.',
+            okText: 'Got it!'
+        });
+        return false;
+    }
+    
+    // Add your registration number format validation here
+    const regFormat = /^[A-Z]{2}\d{6}$/i;  // Example format: AB123456
+    if (!regFormat.test(regNumber)) {
+        await modernDialog.show({
+            title: 'Invalid Format',
+            message: 'Please enter a valid registration number (e.g., E123456)',
+            okText: 'Try Again'
+        });
+        return false;
+    }
+
+    return true;
+}
+
+// Update login button click handler
+document.querySelector('.next-btn').addEventListener('click', async () => {
+    const input = document.querySelector('.input-field');
+    
+    if (!await validateRegistrationNumber(input)) {
+        return;
+    }
+
+    const confirmed = await modernDialog.show({
+        title: 'Confirm Login',
+        message: 'Proceed with login using this registration number?',
+        type: 'confirm',
+        okText: 'Login',
+        cancelText: 'Cancel'
+    });
+
+    if (confirmed) {
+        await modernDialog.show({
+            title: 'Logging In',
+            message: 'Please wait while we verify your credentials...',
+            okText: 'Please Wait'
+        });
+
+        try {
+            // Your login API call here
+            // For demo, using setTimeout
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            await modernDialog.show({
+                title: 'Welcome!',
+                message: 'Login successful. Redirecting to dashboard...',
+                okText: 'Great!'
+            });
+
+            // Redirect after showing success message
+            setTimeout(() => {
+                window.location.href = 'dashboard.php';
+            }, 1000);
+
+        } catch (error) {
+            await modernDialog.show({
+                title: 'Login Failed',
+                message: 'Unable to verify credentials. Please try again.',
+                okText: 'OK'
+            });
+        }
+    }
+});
+
+        // Create floating squares
+        function createSquares() {
+            const container = document.getElementById('squares');
+            for(let i = 0; i < 20; i++) {
+                const square = document.createElement('div');
+                square.className = 'square';
+                square.style.left = Math.random() * 100 + 'vw';
+                square.style.animationDelay = Math.random() * 5 + 's';
+                square.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(square);
+            }
+        }
+
+        // Create glowing dots
+        function createDots() {
+            const container = document.getElementById('dots');
+            for(let i = 0; i < 50; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.left = Math.random() * 100 + 'vw';
+                dot.style.top = Math.random() * 100 + 'vh';
+                dot.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(dot);
+            }
+        }
+
+        // Initialize animations
+        createSquares();
+        createDots();
+
+        // Handle button clicks
+        document.querySelector('.next-btn').addEventListener('click', () => {
+            const input = document.querySelector('.input-field');
+
+            // Add your login logic here
+        });
+
+        document.querySelector('.create-account-btn').addEventListener('click', () => {
+            window.location.href = 'signup.html';
+            // Add your create account logic here
+        });
+        // Update the Next button click handler in index.html
+document.querySelector('.next-btn').addEventListener('click', () => {
+    const input = document.querySelector('.input-field');
+    const regNumber = input.value.trim();
+    
+    
+    // Send login request
+    fetch('login_handler.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `registration_number=${encodeURIComponent(regNumber)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 'success') {
+            window.location.href = data.redirect;
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+
+    });
+});
+
+  // Create particle effect
+  const adminBtn = document.querySelector('.admin-btn');
+    const particlesContainer = document.querySelector('.particles');
+
+    adminBtn.addEventListener('mouseover', createParticles);
+
+    function createParticles() {
+        for(let i = 0; i < 10; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.width = Math.random() * 8 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = `hsl(${Math.random() * 60 + 240}, 70%, 70%)`;
+            particle.style.borderRadius = '50%';
+            particlesContainer.appendChild(particle);
+
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
+        }
+    }
+
+    // Add hover sound effect (optional)
+    adminBtn.addEventListener('mouseenter', () => {
+        const hoverSound = new Audio('hover.mp3'); // Add your sound file
+        hoverSound.volume = 0.2;
+        hoverSound.play();
+    });
+
+    // Refresh functionality
+function refreshPage() {
+    const refreshBtn = document.getElementById('refreshButton');
+    const refreshIcon = refreshBtn.querySelector('.refresh-icon');
+    
+    // Add clicked animation
+    refreshBtn.classList.add('clicked');
+    
+    // Add spinning animation to icon
+    refreshIcon.style.animation = 'spin 1s linear infinite';
+    
+    // Show loading state
+    showToast('Refreshing page...', 'info');
+    
+    // Refresh the page after animation
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// Update last refresh time
+function updateLastRefreshTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+    document.getElementById('refreshTime').textContent = timeStr;
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 p-4 rounded-lg text-white ${
+        type === 'info' ? 'bg-blue-500' : 
+        type === 'success' ? 'bg-green-500' : 
+        'bg-red-500'
+    } transition-opacity duration-300`;
+    toast.style.zIndex = '1001';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Fade in
+    setTimeout(() => {
+        toast.style.opacity = '1';
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Initialize last refresh time on page load
+document.addEventListener('DOMContentLoaded', () => {
+    updateLastRefreshTime();
+});
+
+// Add auto-refresh every 5 minutes (300000 milliseconds)
+setInterval(() => {
+    refreshPage();
+}, 300000);
+
+
+function showDevInfo() {
+    document.getElementById('devModal').style.display = 'block';
+    document.getElementById('dialogOverlay').style.display = 'block';
+}
+
+function hideDevInfo() {
+    document.getElementById('devModal').style.display = 'none';
+    document.getElementById('dialogOverlay').style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('dialogOverlay').addEventListener('click', hideDevInfo);
+    </script>
+</body>
+</html>
