@@ -1,0 +1,36 @@
+name: Deploy Website via SSH
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow only on pushes to the main branch
+
+jobs:
+  deploy:
+    name: Deploy Website
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH agent and add private key
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.ESOFT_LRS_SSH }}
+
+      # Step 3: Deploy all files to the server
+      - name: Deploy Website to Server
+        run: |
+          # Use rsync to transfer all files and folders securely via SSH
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ \
+            root@13.212.230.91:/ # Deploy all files and folders to the server root
+
+          # Optional: Set correct permissions
+          ssh -o StrictHostKeyChecking=no root@13.212.230.91 \
+          "chmod -R 755 / && chown -R www-data:www-data /"
+
