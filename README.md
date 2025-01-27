@@ -26,20 +26,20 @@ This project is a **Student Computer Lab Reservation System** designed for **ESO
 
 ---
 
-## 💻 Tech Stack
+## 🔧 Technologies Used
 
 The system is built using the following technologies:
 
-- **Frontend**:
-  - HTML
-  - CSS
-  - JavaScript
-- **Backend**:
-  - PHP
-- **Database**:
-  - MySQL
-- **Server Environment**:
-  - XAMPP (Offline System)
+- **Frontend**:  
+  - **HTML5**: For structuring the user interface.  
+  - **CSS3**: For styling and creating a visually appealing design.  
+  - **JavaScript**: For client-side interactivity and dynamic features.
+
+- **Backend**:  
+  - **PHP**: For server-side logic and processing.  
+
+- **Database**:  
+  - **PHP My Admin MySQL**: To store student data, reservation details, and system records.
 
 ---
 
@@ -63,6 +63,12 @@ The system is built using the following technologies:
    - Generate usage and reservation history reports.
 
 ---
+## 🚀 Getting Started
+
+### Prerequisites:
+- **PHP 7.x or higher**
+- **Apache Server (XAMPP/WAMP)**
+- **MySQL Database**
 
 ## 🛠 Installation Instructions
 
